@@ -39,11 +39,12 @@ public class Tank : MonoBehaviour {
 
     //音频
     public AudioSource motorAS;
+    public AudioSource shootAS;
 
     //开炮
     public GameObject bullet;
-    public float lastShootTime = 0f;
     public float shootInterval = 0.5f;
+    private float lastShootTime = 0f;
 
     //控制类型
     public TypeClass.CtrlType ctrlType = TypeClass.CtrlType.Player;
@@ -60,6 +61,10 @@ public class Tank : MonoBehaviour {
     public Texture2D centerSight;
     public Texture2D tankSight;
 
+    //击杀UI
+    public Texture2D killUI;
+    private float killTime = float.MinValue;
+
     void Update() {
         PlayerCtrl();
         TankCtrl(axleInfos);
@@ -74,6 +79,7 @@ public class Tank : MonoBehaviour {
         if (ctrlType != TypeClass.CtrlType.Player) return;
         DrawSight();
         DrawHp();
+        DrawKillUI();
     }
 
     // 炮塔旋转
@@ -130,12 +136,10 @@ public class Tank : MonoBehaviour {
         if (ctrlType != TypeClass.CtrlType.Player) return;
         motor = maxMotorTorque * Input.GetAxis("Vertical");
         steering = maxSteeringAngle * Input.GetAxis("Horizontal");
-        if (Input.GetMouseButton(0))
-            Shoot(bullet, gun);
 
         TargetPos(turret);
-        //turretRotTarget = Camera.main.transform.eulerAngles.y;
-        //turretRollTarget = Camera.main.transform.eulerAngles.x;
+        if (Input.GetMouseButton(0))
+            Shoot(bullet, gun);
     }
 
     // 坦克控制
@@ -233,22 +237,36 @@ public class Tank : MonoBehaviour {
             motorAS.Stop();
     }
 
-    void Shoot(GameObject bullet, Transform gun) {
-        if (bullet == null) {
+    void Shoot(GameObject bulletPrefab, Transform gun) {
+        if (bulletPrefab == null) {
             MyDebug.DebugNull("bullet");
             return;
         }
+        if (gun == null) {
+            MyDebug.DebugNull("gun");
+            return;
+        }
+        PoolObject poolObj = bulletPrefab.GetComponent<PoolObject>();
+        if (poolObj == null) return;
 
         if (Time.time - lastShootTime < shootInterval)
             return;
 
+        if (shootAS != null && shootAS.clip != null) {
+            shootAS.spatialBlend = 1;
+            shootAS.Play();
+        }
         Vector3 pos = gun.position + gun.forward * 5;
-        string name = bullet.GetComponent<PoolObject>().objName;
-        ObjectPool.Pop(name, bullet, pos, gun.rotation);
+        GameObject bulletObj = ObjectPool.Pop(poolObj.objName, bulletPrefab, pos, gun.rotation);
+        //为炮弹标记自己的信息
+        Bullet bullet = bulletObj.GetComponent<Bullet>();
+        if (bullet != null) {
+            bullet.attackTank = this.gameObject;
+        }
         lastShootTime = Time.time;
     }
 
-    public void BeAttacked(int att) {
+    public void BeAttacked(int att,GameObject attackTank) {
         if (hp <= 0) return;
         if (hp > 0) hp -= att;
         if (hp <= 0) {
@@ -258,6 +276,13 @@ public class Tank : MonoBehaviour {
                 return;
             }
             destroyEff.SetActive(true);
+            if (attackTank == null) {
+                MyDebug.DebugNull("attackTank");
+                return;
+            }
+            Tank tank = attackTank.GetComponent<Tank>();
+            if (tank != null && tank.ctrlType == TypeClass.CtrlType.Player)
+                tank.StartDrawKill();
         }
     }
 
@@ -337,7 +362,7 @@ public class Tank : MonoBehaviour {
         }
         Rect centerRect = new Rect(
             Screen.width / 2 - centerSight.width / 2,
-            Screen.height /2 - centerSight.height / 2,
+            Screen.height / 2 - centerSight.height / 2,
             centerSight.width,
             centerSight.height);
         GUI.DrawTexture(centerRect, centerSight);
@@ -364,5 +389,19 @@ public class Tank : MonoBehaviour {
         string text = hp.ToString() + "/" + maxHp.ToString();
         Rect txtRect = new Rect(bgRect.x + 80, bgRect.y - 10, 50, 50);
         GUI.Label(txtRect, text);
+    }
+
+    void StartDrawKill() {
+        killTime = Time.time;
+    }
+    void DrawKillUI() {
+        if (killUI == null) {
+            MyDebug.DebugNull("killUI");
+            return;
+        }
+        if (Time.time - killTime < 2f) {
+            Rect rect = new Rect(Screen.width / 2 - killUI.width / 2, 30, killUI.width, killUI.height);
+            GUI.DrawTexture(rect, killUI);
+        }
     }
 }

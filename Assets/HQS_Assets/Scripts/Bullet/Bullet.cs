@@ -7,9 +7,13 @@ public class Bullet : PoolObject {
     public float speed = 100f;
     public float maxLifeTime = 2f;
     public float instTime = 0f;
-    public GameObject explodeEff;
+    public GameObject explodePrefab;
 
     public float att = 100;
+    public AudioClip explodeClip;
+
+    [HideInInspector]
+    public GameObject attackTank;
 
     void OnEnable() {
         instTime = Time.time;
@@ -24,19 +28,26 @@ public class Bullet : PoolObject {
     }
 
     private void OnCollisionEnter(Collision collision) {
-        if (explodeEff == null) {
+        if (explodePrefab == null) {
             MyDebug.DebugNull("explodeEff");
             return;
         }
+        if (explodeClip == null) {
+            MyDebug.DebugNull("explodeClip");
+            return;
+        }
 
-        Instantiate(explodeEff, transform.position, transform.rotation);
+        GameObject explodeObj = Instantiate(explodePrefab, transform.position, transform.rotation);   //爆炸音效
+        AudioSource audioSource = explodeObj.AddComponent<AudioSource>();
+        audioSource.spatialBlend = (Time.time - instTime) * 1.5f;
+        audioSource.PlayOneShot(explodeClip);
         ObjectPool.Push(objName, this.gameObject);
 
         //击中坦克
         Tank tank = collision.gameObject.GetComponent<Tank>();
         if (tank != null) {
             int att = GetAtt();
-            tank.BeAttacked(att);
+            tank.BeAttacked(att, attackTank);
         }
     }
 

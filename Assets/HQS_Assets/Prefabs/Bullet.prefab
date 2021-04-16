@@ -112,11 +112,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objName: bullet
-  speed: 1
+  speed: 100
   maxLifeTime: 2
   instTime: 0
-  explodeEff: {fileID: 1875035261626762, guid: 3e2bd2f838657f34db77754327c0b1e5, type: 2}
+  explodePrefab: {fileID: 1875035261626762, guid: 3e2bd2f838657f34db77754327c0b1e5,
+    type: 2}
   att: 100
+  explodeClip: {fileID: 8300000, guid: 3cbf227256e584346a204a4f86c93c69, type: 3}
+  attackTank: {fileID: 0}
 --- !u!135 &135835233102807026
 SphereCollider:
   m_ObjectHideFlags: 1
