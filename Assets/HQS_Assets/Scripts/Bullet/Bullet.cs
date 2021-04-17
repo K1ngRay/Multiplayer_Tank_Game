@@ -13,7 +13,7 @@ public class Bullet : PoolObject {
     public AudioClip explodeClip;
 
     [HideInInspector]
-    public GameObject attackTank;
+    public Tank attackTank;
 
     void OnEnable() {
         instTime = Time.time;

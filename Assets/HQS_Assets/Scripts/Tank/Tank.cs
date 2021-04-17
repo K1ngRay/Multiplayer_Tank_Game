@@ -1,18 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.AI;
 
 public class Tank : MonoBehaviour {
 
-    public Transform turret;
+    [SerializeField]
+    private GameObject cameraPoint;
+    [SerializeField]
+    private Transform turret;
     [SerializeField]
     private float turretRotSpeed = 0.5f;
-    private float turretRotTarget = 0f;
-    private float turretRollTarget = 0f;
+    private float turretRotTarget = 0f; //炮塔横向旋转的目标指
+    private float turretRollTarget = 0f; //炮口竖向旋转的目标值
 
 
-    public Transform gun;
+    [SerializeField]
+    private Transform gun;
     private float maxRoll = 10f;
     private float minRoll = -2f;
 
@@ -21,28 +24,36 @@ public class Tank : MonoBehaviour {
     //马力
     private float motor = 0;
     //最大马力
-    public float maxMotorTorque;
+    [SerializeField]
+    private float maxMotorTorque;
 
     //制动
     private float brakeTorque;
     //最大制动
-    public float maxBrakeTorque = 100;
+    [SerializeField]
+    private float maxBrakeTorque = 100;
 
     //转向角
     private float steering;
     //最大转向角
-    public float maxSteeringAngle;
+    [SerializeField]
+    private float maxSteeringAngle;
 
     //轮子和履带
-    public List<Transform> wheelObjects;
-    public List<SkinnedMeshRenderer> trackObjects;
+    [SerializeField]
+    private List<Transform> wheelObjects;
+    [SerializeField]
+    private List<SkinnedMeshRenderer> trackObjects;
 
     //音频
-    public AudioSource motorAS;
-    public AudioSource shootAS;
+    [SerializeField]
+    private AudioSource motorAS;
+    [SerializeField]
+    private AudioSource shootAS;
 
     //开炮
-    public GameObject bullet;
+    [SerializeField]
+    private GameObject bullet;
     public float shootInterval = 0.5f;
     private float lastShootTime = 0f;
 
@@ -52,23 +63,74 @@ public class Tank : MonoBehaviour {
     //血量
     public int hp = 100;
     public int maxHp = 100;
-    public GameObject destroyEff;
+    [SerializeField]
+    private GameObject destroyEff;
     //血量GUI
-    public Texture2D hpBarBg;
-    public Texture2D hpBar;
+    [SerializeField]
+    private Texture2D hpBarBg;
+    [SerializeField]
+    private Texture2D hpBar;
 
     //准心GUI
-    public Texture2D centerSight;
-    public Texture2D tankSight;
+    [SerializeField]
+    private Texture2D centerSight;
+    [SerializeField]
+    private Texture2D tankSight;
 
     //击杀UI
-    public Texture2D killUI;
+    [SerializeField]
+    private Texture2D killUI;
     private float killTime = float.MinValue;
+
+    //AI
+    private AI ai;
+
+    //导航障碍
+    public NavMeshObstacle navObstacle;
+
+    public Transform Turret {
+        get {
+            return turret;
+        }
+    }
+
+    public float MaxMotorTorque {
+        get {
+            return maxMotorTorque;
+        }
+    }
+
+    public float MaxBrakeTorque {
+        get {
+            return maxBrakeTorque;
+        }
+    }
+
+    public float MaxSteeringAngle {
+        get {
+            return maxSteeringAngle;
+        }
+    }
+
+    public GameObject CameraPoint {
+        get {
+            return cameraPoint;
+        }
+    }
+
+    void Start() {
+        if (ctrlType == TypeClass.CtrlType.Computer) {
+            ai = gameObject.AddComponent<AI>();
+            ai.tank = this;
+        }
+    }
 
     void Update() {
         PlayerCtrl();
-        TankCtrl(axleInfos);
+        ComputerCtrl();
+        DeathCtrl();
 
+        TankMove(axleInfos);
         TurretRotate(turret);
         TurretRoll(turret, gun);
 
@@ -82,6 +144,49 @@ public class Tank : MonoBehaviour {
         DrawKillUI();
     }
 
+    // 玩家输入控制
+    void PlayerCtrl() {
+        if (ctrlType != TypeClass.CtrlType.Player) return;
+        motor = maxMotorTorque * Input.GetAxis("Vertical");
+        steering = maxSteeringAngle * Input.GetAxis("Horizontal");
+
+        TargetPos(turret);
+        if (Input.GetMouseButton(0))
+            Shoot(bullet, gun);
+    }
+
+    //电脑控制
+    void ComputerCtrl() {
+        if (ctrlType != TypeClass.CtrlType.Computer) return;
+        if (ai == null) {
+            MyDebug.DebugNull("ai");
+            return;
+        }
+        Vector3 rot = ai.GetTurretTarget();
+        turretRotTarget = rot.y;
+        turretRollTarget = rot.x;
+
+        //移动
+        steering = ai.GetSteering();
+        motor = ai.GetMotor();
+        brakeTorque = ai.GetBrakeTorque();
+        //开炮
+        if (ai.IsShoot())
+            Shoot(bullet, gun);
+    }
+
+    //死亡下的控制参数
+    void DeathCtrl() {
+        if (ctrlType != TypeClass.CtrlType.Death) return;
+
+        motor = 0;
+        steering = 0;
+        brakeTorque = maxBrakeTorque;
+        if (navObstacle != null)
+            navObstacle.enabled = true;
+    }
+
+    #region 坦克逻辑
     // 炮塔旋转
     void TurretRotate(Transform turret) {
         if (Camera.main == null) {
@@ -131,19 +236,8 @@ public class Tank : MonoBehaviour {
         gun.localEulerAngles = new Vector3(euler.x, localEuler.y, localEuler.z);
     }
 
-    // 玩家输入控制
-    void PlayerCtrl() {
-        if (ctrlType != TypeClass.CtrlType.Player) return;
-        motor = maxMotorTorque * Input.GetAxis("Vertical");
-        steering = maxSteeringAngle * Input.GetAxis("Horizontal");
-
-        TargetPos(turret);
-        if (Input.GetMouseButton(0))
-            Shoot(bullet, gun);
-    }
-
     // 坦克控制
-    void TankCtrl(List<AxleInfo> axleInfos) {
+    void TankMove(List<AxleInfo> axleInfos) {
         if (axleInfos == null) {
             MyDebug.DebugNull("axleInfos");
             return;
@@ -161,7 +255,6 @@ public class Tank : MonoBehaviour {
                 item.rightWheel.motorTorque = motor;
             }
             //制动
-            brakeTorque = 0;
             //前进时刹车
             if (item.leftWheel.rpm > 5 && motor < 0)
                 brakeTorque = maxBrakeTorque;
@@ -171,6 +264,7 @@ public class Tank : MonoBehaviour {
             item.leftWheel.brakeTorque = brakeTorque;
             item.rightWheel.brakeTorque = brakeTorque;
         }
+        brakeTorque = 0;
         //转动轮子履带
         if (axleInfos[1] != null) {
             WheelsRotation(axleInfos[1].leftWheel, wheelObjects);
@@ -261,16 +355,22 @@ public class Tank : MonoBehaviour {
         //为炮弹标记自己的信息
         Bullet bullet = bulletObj.GetComponent<Bullet>();
         if (bullet != null) {
-            bullet.attackTank = this.gameObject;
+            bullet.attackTank = this;
         }
         lastShootTime = Time.time;
     }
 
-    public void BeAttacked(int att,GameObject attackTank) {
+    public void BeAttacked(int att, Tank attackTank) {
         if (hp <= 0) return;
-        if (hp > 0) hp -= att;
+        if (hp > 0) {
+            hp -= att;
+
+            //AI
+            if (ai != null && ctrlType == TypeClass.CtrlType.Computer)
+                ai.OnAttacked(attackTank);
+        }
         if (hp <= 0) {
-            ctrlType = TypeClass.CtrlType.None;
+            ctrlType = TypeClass.CtrlType.Death;
             if (destroyEff == null) {
                 MyDebug.DebugNull("destroyEff");
                 return;
@@ -280,12 +380,13 @@ public class Tank : MonoBehaviour {
                 MyDebug.DebugNull("attackTank");
                 return;
             }
-            Tank tank = attackTank.GetComponent<Tank>();
-            if (tank != null && tank.ctrlType == TypeClass.CtrlType.Player)
-                tank.StartDrawKill();
+            attackTank.StartDrawKill();
+            Battle.Instance.IsWin(attackTank);
         }
     }
+    #endregion
 
+    #region UI
     //计算屏幕准心
     void TargetPos(Transform turret) {
         if (turret == null) {
@@ -392,7 +493,8 @@ public class Tank : MonoBehaviour {
     }
 
     void StartDrawKill() {
-        killTime = Time.time;
+        if (ctrlType == TypeClass.CtrlType.Player)
+            killTime = Time.time;
     }
     void DrawKillUI() {
         if (killUI == null) {
@@ -405,3 +507,4 @@ public class Tank : MonoBehaviour {
         }
     }
 }
+#endregion

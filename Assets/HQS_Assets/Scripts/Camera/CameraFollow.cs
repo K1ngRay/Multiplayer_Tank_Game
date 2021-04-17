@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour {
 
-    public GameObject target;
+    private GameObject target;
 
     private float distance = 8f;
     private float maxDis = 22f;
@@ -30,6 +30,15 @@ public class CameraFollow : MonoBehaviour {
         Rotate();
         Roll();
         Zoom();
+    }
+
+    public void SetTarget(GameObject target) {
+        if (target == null) {
+            MyDebug.DebugNull("target");
+            return;
+        }
+
+        this.target = target;
     }
 
     void ReFresh() {

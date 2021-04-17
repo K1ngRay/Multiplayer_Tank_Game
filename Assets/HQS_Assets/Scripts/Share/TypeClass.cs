@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class TypeClass {
     public enum CtrlType {
-        None,
+        Death,
         Player,
         Computer
+    }
+
+    public enum FSMStatus {
+        Patrol,
+        Attack
     }
 }
