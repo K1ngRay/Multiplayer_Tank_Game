@@ -13,4 +13,9 @@ public class TypeClass {
         Patrol,
         Attack
     }
+
+    public enum PanelLayer {
+        Panel,
+        Tips,
+    }
 }

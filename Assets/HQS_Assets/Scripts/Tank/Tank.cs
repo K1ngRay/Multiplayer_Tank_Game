@@ -82,6 +82,9 @@ public class Tank : MonoBehaviour {
     private Texture2D killUI;
     private float killTime = float.MinValue;
 
+    [SerializeField]
+    private Texture2D arrowUI;
+
     //AI
     private AI ai;
 
@@ -138,10 +141,14 @@ public class Tank : MonoBehaviour {
     }
 
     void OnGUI() {
-        if (ctrlType != TypeClass.CtrlType.Player) return;
-        DrawSight();
-        DrawHp();
-        DrawKillUI();
+        if (ctrlType == TypeClass.CtrlType.Computer) {
+            DrawArrowUI(Battle.Instance.GetCamp(this));
+        }
+        if (ctrlType == TypeClass.CtrlType.Player) {
+            DrawSight();
+            DrawHp();
+            DrawKillUI();
+        }
     }
 
     // 玩家输入控制
@@ -380,8 +387,12 @@ public class Tank : MonoBehaviour {
                 MyDebug.DebugNull("attackTank");
                 return;
             }
-            attackTank.StartDrawKill();
-            Battle.Instance.IsWin(attackTank);
+            if (ai != null)
+                ai.ClearPath();
+            if (!Battle.Instance.IsPlayerFail(this))
+                Battle.Instance.IsWin(attackTank);
+            if (!Battle.Instance.IsSameCamp(this, attackTank))
+                attackTank.StartDrawKill();
         }
     }
     #endregion
@@ -505,6 +516,20 @@ public class Tank : MonoBehaviour {
             Rect rect = new Rect(Screen.width / 2 - killUI.width / 2, 30, killUI.width, killUI.height);
             GUI.DrawTexture(rect, killUI);
         }
+    }
+
+    void DrawArrowUI(int camp) {
+        if (arrowUI == null) {
+            MyDebug.DebugNull("arrowUI");
+            return;
+        }
+        Vector3 point = Camera.main.WorldToScreenPoint(cameraPoint.transform.position);
+        Rect arrowRect = new Rect(
+            point.x - arrowUI.width / 2,
+            Screen.height - point.y - arrowUI.height / 2 - 10f,
+            arrowUI.width,
+            arrowUI.height);
+        GUI.DrawTexture(arrowRect, arrowUI);
     }
 }
 #endregion

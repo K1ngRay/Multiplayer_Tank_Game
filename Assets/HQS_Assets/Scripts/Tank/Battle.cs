@@ -16,6 +16,7 @@ public class Battle : MonoBehaviour {
     public GameObject[] tankPrefabs;
 
     private static Battle instance;
+    private int camp1Count = 0;
 
     public static Battle Instance {
         get {
@@ -26,36 +27,44 @@ public class Battle : MonoBehaviour {
     void Start() {
         if (instance == null)
             instance = this;
-        if (camps.Length == 2) {
-            StartThreeCampBattle(camps[0].number, camps[1].number, 0);
-        }
-        else if (camps.Length == 3) {
-            StartThreeCampBattle(camps[0].number, camps[1].number, camps[2].number);
-        }
     }
 
-    // Update is called once per frame
-    void Update() {
-
+    public void SetTankNumber(int t1,int t2,int t3) {
+        camps[0].number = t1;
+        camps[1].number = t2;
+        camps[2].number = t3;
     }
 
-    void StartThreeCampBattle(int t1, int t2, int t3 = 0) {
-        ClearBattle();
-        battleTanks = new BattleTank[t1 + t2 + t3];
-        if (camps.Length < 2 || (t3 > 0 && camps.Length < 3)) {
-            Debug.Log("阵营数与阵营生成点数不匹配");
+    public void StartThreeCampBattle() {
+        if (camps.Length < 3) {
+            Debug.Log("阵营数小于3");
             return;
         }
+        if (camps[0].number > camps[0].spawnPoints.Length) {
+            Debug.LogError("阵营1坦克数量大于生成点数量");
+            return;
+        }
+        if (camps[1].number > camps[1].spawnPoints.Length) {
+            Debug.LogError("阵营2坦克数量大于生成点数量");
+            return;
+        }
+        if (camps[2].number > camps[2].spawnPoints.Length) {
+            Debug.LogError("阵营3坦克数量大于生成点数量");
+            return;
+        }
+        ClearBattle();
+        int t1 = camps[0].number;
+        int t2 = camps[1].number;
+        int t3 = camps[2].number;
+        battleTanks = new BattleTank[t1 + t2 + t3];
         for (int i = 0; i < camps[0].spawnPoints.Length && i < t1; i++) {
             GenerateTank(1, i, camps[0], i);
         }
         for (int i = 0; i < camps[1].spawnPoints.Length && i < t2; i++) {
             GenerateTank(2, i, camps[1], t1 + i);
         }
-        if (t3 > 0) {
-            for (int i = 0; i < camps[2].spawnPoints.Length && i < t3; i++) {
-                GenerateTank(3, i, camps[2], t1 + t2 + i);
-            }
+        for (int i = 0; i < camps[2].spawnPoints.Length && i < t3; i++) {
+            GenerateTank(3, i, camps[2], t1 + t2 + i);
         }
         CameraFollow cf = Camera.main.GetComponent<CameraFollow>();
         if (cf == null) {
@@ -88,6 +97,10 @@ public class Battle : MonoBehaviour {
     }
 
     public int GetCamp(Tank tank) {
+        if (tank == null) {
+            MyDebug.DebugNull("tank");
+            return 0;
+        }
         for (int i = 0; i < battleTanks.Length; i++) {
             BattleTank battleTank = battleTanks[i];
             if (battleTank == null) return 0;
@@ -101,6 +114,19 @@ public class Battle : MonoBehaviour {
         return GetCamp(tank1) == GetCamp(tank2);
     }
 
+    public bool IsPlayerFail(Tank tank) {
+        if (GetCamp(tank) == 1) {
+            camp1Count++;
+            if (camp1Count >= camps[0].number) {
+                ClearBattle();
+                PanelMgr.Instance.OpenPanel<ResultPanel>("", -1);
+                Debug.Log("玩家已战败");
+                return true;
+            }
+        }
+        return false;
+    }
+
     public bool IsWin(int camp) {
         for (int i = 0; i < battleTanks.Length; i++) {
             Tank tank = battleTanks[i].tank;
@@ -108,6 +134,8 @@ public class Battle : MonoBehaviour {
                 if (tank.hp > 0 || tank.ctrlType != TypeClass.CtrlType.Death)
                     return false;
         }
+        ClearBattle();
+        PanelMgr.Instance.OpenPanel<ResultPanel>("",camp);
         Debug.Log(camp + "阵营获胜");
         return true;
     }
@@ -123,6 +151,11 @@ public class Battle : MonoBehaviour {
         for (int i = 0; i < tanks.Length; i++) {
             Destroy(tanks[i]);
         }
+        camp1Count = 0;
+    }
+
+    public Color GetCampColor(int camp) {
+        return camps[camp - 1].color;
     }
 
     private void OnDrawGizmos() {

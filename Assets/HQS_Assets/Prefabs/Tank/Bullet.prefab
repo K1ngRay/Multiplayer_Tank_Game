@@ -112,7 +112,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objName: bullet
-  speed: 100
+  speed: 1000
   maxLifeTime: 2
   instTime: 0
   explodePrefab: {fileID: 1875035261626762, guid: 3e2bd2f838657f34db77754327c0b1e5,

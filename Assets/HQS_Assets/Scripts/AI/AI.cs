@@ -232,7 +232,7 @@ public class AI : MonoBehaviour {
         Ray ray = new Ray(pos, transform.forward);
         Debug.DrawLine(pos, pos + transform.forward * 5f, Color.red);
         if (Physics.Raycast(ray, out hit, 5f)) {
-            path.InitByNavMeshPath(transform.position, transform.position - transform.forward * 5f);
+            path.InitByNavMeshPath(transform.position, transform.position - transform.forward * 15f);
             return -tank.MaxMotorTorque;
         }
 
@@ -242,6 +242,10 @@ public class AI : MonoBehaviour {
             return -tank.MaxMotorTorque;
 
         else return tank.MaxMotorTorque;
+    }
+
+    public void ClearPath() {
+        path.waypoints = null;
     }
 
     //获取制动

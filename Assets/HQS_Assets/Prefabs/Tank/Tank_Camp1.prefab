@@ -5504,6 +5504,7 @@ MonoBehaviour:
   centerSight: {fileID: 2800000, guid: 4da641c62fbeb7744a4f08969e9ae9fa, type: 3}
   tankSight: {fileID: 2800000, guid: 7978587a19d0ee946949c447d48b11c6, type: 3}
   killUI: {fileID: 2800000, guid: a5ad4119eee76194382e819424e00498, type: 3}
+  arrowUI: {fileID: 2800000, guid: 61d534aebde0eb541b663b839690db48, type: 3}
   navObstacle: {fileID: 208491650771905940}
 --- !u!137 &137119497389479294
 SkinnedMeshRenderer:
