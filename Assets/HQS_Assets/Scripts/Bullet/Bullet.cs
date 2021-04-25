@@ -5,7 +5,7 @@ using UnityEngine;
 public class Bullet : PoolObject {
 
     public float speed = 100f;
-    public float maxLifeTime = 2f;
+    public float maxLifeTime = 4f;
     public float instTime = 0f;
     public GameObject explodePrefab;
 

@@ -130,13 +130,15 @@ public class Battle : MonoBehaviour {
     public bool IsWin(int camp) {
         for (int i = 0; i < battleTanks.Length; i++) {
             Tank tank = battleTanks[i].tank;
-            if (battleTanks[i].camp != camp)
+            //if (battleTanks[i].camp != camp)
+            if (battleTanks[i].camp != 1) //以玩家为主，只判断1阵营是否赢了
                 if (tank.hp > 0 || tank.ctrlType != TypeClass.CtrlType.Death)
                     return false;
         }
         ClearBattle();
-        PanelMgr.Instance.OpenPanel<ResultPanel>("",camp);
-        Debug.Log(camp + "阵营获胜");
+        //PanelMgr.Instance.OpenPanel<ResultPanel>("",camp);
+        //Debug.Log(camp + "阵营获胜");
+        PanelMgr.Instance.OpenPanel<ResultPanel>("", 1);
         return true;
     }
 

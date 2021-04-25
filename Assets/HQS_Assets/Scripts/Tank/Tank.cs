@@ -16,8 +16,8 @@ public class Tank : MonoBehaviour {
 
     [SerializeField]
     private Transform gun;
-    private float maxRoll = 10f;
-    private float minRoll = -2f;
+    private float maxRoll = 5f;
+    private float minRoll = -8f;
 
     public List<AxleInfo> axleInfos;
 
@@ -75,6 +75,7 @@ public class Tank : MonoBehaviour {
     [SerializeField]
     private Texture2D centerSight;
     [SerializeField]
+    private Texture2D[] tankSights;
     private Texture2D tankSight;
 
     //击杀UI
@@ -126,6 +127,8 @@ public class Tank : MonoBehaviour {
             ai = gameObject.AddComponent<AI>();
             ai.tank = this;
         }
+        if (tankSights[0] != null)
+            tankSight = tankSights[0];
     }
 
     void Update() {
@@ -160,6 +163,11 @@ public class Tank : MonoBehaviour {
         TargetPos(turret);
         if (Input.GetMouseButton(0))
             Shoot(bullet, gun);
+        if (Input.GetKey(KeyCode.Space)) {
+            motor = 0;
+            steering = 0;
+            brakeTorque = maxBrakeTorque;
+        }
     }
 
     //电脑控制
@@ -438,8 +446,17 @@ public class Tank : MonoBehaviour {
         Ray ray = new Ray(pos, gun.forward);
         if (Physics.Raycast(ray, out hit, 400f)) {
             hitPoint = hit.point;
+            Tank targetTank = hit.transform.GetComponent<Tank>();
+            if (targetTank != null && !Battle.Instance.IsSameCamp(this, targetTank) && tankSights[1] != null)
+                tankSight = tankSights[1];
+            else if(tankSights[0] != null)
+                tankSight = tankSights[0];
         }
-        else hitPoint = ray.GetPoint(400f);
+        else {
+            hitPoint = ray.GetPoint(400f);
+            if (tankSights[0] != null)
+                tankSight = tankSights[0];
+        }
 
         return hitPoint;
     }
@@ -524,11 +541,15 @@ public class Tank : MonoBehaviour {
             return;
         }
         Vector3 point = Camera.main.WorldToScreenPoint(cameraPoint.transform.position);
+        float distance = Vector3.Distance(Camera.main.transform.position, cameraPoint.transform.position);
+        float d = 50f / distance;
+        if (d < 0.3f) d = 0.5f;
+        else if (d > 1f) d = 1f;
         Rect arrowRect = new Rect(
-            point.x - arrowUI.width / 2,
-            Screen.height - point.y - arrowUI.height / 2 - 10f,
-            arrowUI.width,
-            arrowUI.height);
+            point.x - arrowUI.width * d / 2,
+            Screen.height - point.y - arrowUI.height * d / 2 - 10f,
+            arrowUI.width * d,
+            arrowUI.height * d);
         GUI.DrawTexture(arrowRect, arrowUI);
     }
 }

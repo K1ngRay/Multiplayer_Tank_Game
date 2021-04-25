@@ -5504,7 +5504,9 @@ MonoBehaviour:
   hpBarBg: {fileID: 2800000, guid: a0014cd40b31fc44c876579a47cac2cf, type: 3}
   hpBar: {fileID: 2800000, guid: 2b2231a0a71cb984c997705f94af6358, type: 3}
   centerSight: {fileID: 2800000, guid: 4da641c62fbeb7744a4f08969e9ae9fa, type: 3}
-  tankSight: {fileID: 2800000, guid: 7978587a19d0ee946949c447d48b11c6, type: 3}
+  tankSights:
+  - {fileID: 2800000, guid: 7978587a19d0ee946949c447d48b11c6, type: 3}
+  - {fileID: 2800000, guid: 3128410d4c134d94aacf37c30cb8732b, type: 3}
   killUI: {fileID: 2800000, guid: a5ad4119eee76194382e819424e00498, type: 3}
   arrowUI: {fileID: 2800000, guid: c18da6c570c640c4eae2881e4bad79b8, type: 3}
   navObstacle: {fileID: 208360273720380606}
@@ -5749,7 +5751,7 @@ NavMeshObstacle:
   m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_Extents: {x: 2.5, y: 0.5, z: 2.5}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1

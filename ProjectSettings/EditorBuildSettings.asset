@@ -4,4 +4,7 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/HQS_Assets/Scenes/Net.unity
+    guid: 589ca76a352f6f84d97c765daf8ea3b0
