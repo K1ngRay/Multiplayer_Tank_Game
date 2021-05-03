@@ -43,9 +43,8 @@ public class Net : MonoBehaviour {
             string str = System.Text.Encoding.UTF8.GetString(readBuffer, 0, count);
             if (recvStr.Length > 300)
                 recvStr = "";
-            recvStr += str + "\n";
-            //todo:为甚是null
-            socket.BeginReceive(readBuffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveCb, null);
+            recvStr += str + "\n";            
+            socket.BeginReceive(readBuffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveCb, null); //因为没必要转化为什么类，所以直接给null，可参考服务端的不同
         }
         catch (Exception e) {
             recvStr += "连接已断开";
