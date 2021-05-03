@@ -138,7 +138,7 @@ public class Walk : MonoBehaviour {
         string[] args = str.Split(' ');
         if (args[0] == "POS")
             OnRecvPos(args[1], args[2], args[3], args[4]);
-        else if (args[1] == "LEAVE")
+        else if (args[0] == "LEAVE")
             OnRecvLeave(args[1]);
 
     }
