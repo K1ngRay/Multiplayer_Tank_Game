@@ -91,7 +91,8 @@ public class Walk : MonoBehaviour {
         float x = 0 + UnityEngine.Random.Range(-30, 30);
         float y = 0;
         float z = 0 + UnityEngine.Random.Range(-30, 30);
-        Vector3 pos = new Vector3(x, y, z);        AddPlayer(id, pos);
+        Vector3 pos = new Vector3(x, y, z);
+        AddPlayer(id, pos);
         //同步
         SendPosProtocol(pos);
     }
