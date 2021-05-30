@@ -56,7 +56,7 @@ class ProtocolBytes : ProtocolBase {
         return GetString(start, ref end);
     }
 
-    public void AdddInt(int num) {
+    public void AddInt(int num) {
         byte[] numBytes = BitConverter.GetBytes(num);
         if (bytes == null)
             bytes = numBytes;

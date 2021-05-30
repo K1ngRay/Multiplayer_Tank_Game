@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Linq;
+using System.Reflection;
 class ServNet {
     public Socket listenfd;
     public Conn[] conns;
@@ -11,6 +12,10 @@ class ServNet {
 
     System.Timers.Timer timer = new System.Timers.Timer(1000);
     public long heartBeatTime = 180;
+
+    public HandleConnMsg handleConnMsg = new HandleConnMsg();
+    public HandlePlayerMsg handlePlayerMsg = new HandlePlayerMsg();
+    public HandlePlayerEvent handlePlayerEvent = new HandlePlayerEvent();
     //单例
     public static ServNet instance;
     public ServNet() {
@@ -182,18 +187,36 @@ class ServNet {
 
     private void HandleMsg(Conn conn,ProtocolBase protoBase) {
         string name = protoBase.GetName();
-        Console.WriteLine("[收到协议]" + name);
-        if (name == "HeatBeat") {
-            Console.WriteLine("[更新心跳时间]" + conn.GetAddress());
-            conn.lastTickTime = Sys.GetTimeStamp();
+        string methodName = "Msg" + name; //todo:值得好好学学
+
+        if(conn.player == null || name == "HeatBeat" || name == "Logout") {
+            MethodInfo mm = handleConnMsg.GetType().GetMethod(methodName);
+            if (mm == null) {
+                string str = "[警告]HandleMsg:没有处理连接方法";
+                Console.WriteLine(str+methodName);
+                return;
+            }
+            Object[] obj = new object[] { conn, protoBase };
+            Console.WriteLine("[处理连接信息]" + conn.GetAddress() + ":" + name);
+            mm.Invoke(handleConnMsg, obj);
         }
-        Send(conn, protoBase);
+        else {
+            MethodInfo mm = handlePlayerMsg.GetType().GetMethod(methodName);
+            if (mm == null) {
+                string str = "[警告]HandleMsg没有处理玩家方法";
+                Console.WriteLine(str + methodName);
+                return;
+            }
+            Object[] obj = new object[] { conn.player, protoBase };
+            Console.WriteLine("[处理玩家消息]" + conn.player.id + ":" + name);
+            mm.Invoke(handlePlayerMsg, obj);
+        }
     }
 
     //心跳回调函数，每秒执行一次
     private void HeartBeat() {
         long timeNow = Sys.GetTimeStamp();
-        Console.WriteLine("[主定时器运行]");
+        //Console.WriteLine("[主定时器运行]");
         for (int i = 0; i < conns.Length; i++) {
             Conn conn = conns[i];
             if (conn == null) continue;
@@ -204,6 +227,20 @@ class ServNet {
                     conn.Close();
                 }
             }
+        }
+    }
+
+    public void Print() {
+        Console.WriteLine("===服务器登录信息===");
+        for (int i = 0; i < conns.Length; i++) {
+            if (conns[i] == null) continue;
+            if (!conns[i].isUse) continue;
+
+            string str = "连接[" + conns[i].GetAddress() + "]";
+            if (conns[i].player!=null) {
+                str += "玩家id " + conns[i].player.id;
+            }
+            Console.WriteLine(str);
         }
     }
 }

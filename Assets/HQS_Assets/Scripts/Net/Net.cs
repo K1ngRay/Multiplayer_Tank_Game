@@ -13,6 +13,8 @@ public class Net : MonoBehaviour {
     public InputField recvInput;
     public InputField clientInput;
     public InputField sendInput;
+    public InputField idInput;
+    public InputField pwdInput;
 
     Socket socket;
     string recvStr = "";
@@ -97,6 +99,11 @@ public class Net : MonoBehaviour {
     private void HandleMsg(ProtocolBase protoBase) {
         ProtocolBytes proto = (ProtocolBytes)protoBase;
         Debug.Log("接收" + proto.GetDesc());
+
+        int start = 0;
+        string protoName = proto.GetString(start, ref start);
+        int ret = proto.GetInt(start, ref start);
+        recvStr = "接收" + proto.GetName() + " " + ret.ToString();
     }
 
     public void OnSendClick() {
@@ -111,6 +118,29 @@ public class Net : MonoBehaviour {
         byte[] length = BitConverter.GetBytes(bytes.Length);
         byte[] sendBuffer = length.Concat(bytes).ToArray();
         socket.Send(sendBuffer);
+    }
+
+    public void OnLoginClick() {
+        ProtocolBytes protocol = new ProtocolBytes();
+        protocol.AddString("Login");
+        protocol.AddString(idInput.text);
+        protocol.AddString(pwdInput.text);
+        Debug.Log("发送 " + protocol.GetDesc()); //todo:数据是怎么组建的
+        Send(protocol);
+    }
+
+    public void OnAddClick() {
+        ProtocolBytes protocol = new ProtocolBytes();
+        protocol.AddString("AddScore");
+        Debug.Log("发送 " + protocol.GetDesc());
+        Send(protocol);
+    }
+
+    public void OnGetClick() {
+        ProtocolBytes protocol = new ProtocolBytes();
+        protocol.AddString("GetScore");
+        Debug.Log("发送 " + protocol.GetDesc());
+        Send(protocol);
     }
     #endregion
     #region 同步

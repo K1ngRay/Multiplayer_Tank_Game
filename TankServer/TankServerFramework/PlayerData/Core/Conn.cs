@@ -63,8 +63,8 @@ class Conn {
     }
 
     //发送协议
-    public void Send() {
-
+    public void Send(ProtocolBase protocol) {
+        ServNet.instance.Send(this, protocol);
     }
 }
 

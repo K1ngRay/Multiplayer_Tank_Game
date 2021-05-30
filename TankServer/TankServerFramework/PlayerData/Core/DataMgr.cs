@@ -1,5 +1,4 @@
 ﻿using System;
-using MySql.Data; //todo:去掉会缺什么
 using MySql.Data.MySqlClient;
 using System.Data;
 using System.Text.RegularExpressions;
