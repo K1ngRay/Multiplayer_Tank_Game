@@ -1,4 +1,4 @@
-﻿class ProtocolStr : ProtocolBase {
+﻿public class ProtocolStr : ProtocolBase {
     public string str;
     public override ProtocolBase Decode(byte[] readBuffer, int start, int length) {
         ProtocolStr protocol = new ProtocolStr();

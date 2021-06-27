@@ -38,12 +38,14 @@ public class AI : MonoBehaviour {
     }
 
     private void ChangeStatus(TypeClass.FSMStatus status) {
+        #region 不重要
         if (tank == null) {
             MyDebug.DebugNull("tank");
             return;
         }
         if (tank.ctrlType != TypeClass.CtrlType.Computer)
             return;
+        #endregion
 
         switch (status) {
             case TypeClass.FSMStatus.Patrol:
@@ -58,18 +60,14 @@ public class AI : MonoBehaviour {
     }
 
     void Update() {
+        #region 不重要
         if (tank == null) {
             MyDebug.DebugNull("tank");
             return;
         }
         if (tank.ctrlType != TypeClass.CtrlType.Computer)
             return;
-
-        //搜寻目标
-        TargetUpdate();
-        //更新路点
-        if (path != null && path.IsReach(transform))
-            path.NextWaypoint();
+        #endregion
 
         switch (status) {
             case TypeClass.FSMStatus.Patrol:
@@ -88,14 +86,23 @@ public class AI : MonoBehaviour {
     }
 
     void AttackStart() {
+        //攻击初始化，修改路线
         Vector3 dir = Vector3.Normalize(target.transform.position - transform.position);
         Vector3 targetPos = target.transform.position - dir * 10f;
         path.InitByNavMeshPath(transform.position, targetPos);
     }
 
     void PatrolUpdate() {
+        //目标出现，切换成攻击状态
         if (target != null)
             ChangeStatus(TypeClass.FSMStatus.Attack);
+        //搜寻目标
+        TargetUpdate();
+        //更新路点
+        if (path != null && path.IsReach(transform))
+            path.NextWaypoint();
+
+        #region 巡逻...
         float interval = Time.time - lastUpdateWaypointTime;
         if (interval < updateWaypointInterval) return;
         if (path.waypoints == null || path.isFinish || interval > 20f) {
@@ -110,12 +117,15 @@ public class AI : MonoBehaviour {
             if (index == path.lastPoint) index = (index + 1) % count;
             path.InitByNavMeshPath(transform.position, targetPos);
         }
+        #endregion
     }
 
     void AttackUpdate() {
-        //目标丢失
+        //目标丢失，切换巡逻状态
         if (target == null)
             ChangeStatus(TypeClass.FSMStatus.Patrol);
+
+        #region 攻击...
         float interval = Time.time - lastUpdateWaypointTime;
         if (interval < updateWaypointInterval) return;
         lastUpdateWaypointTime = Time.time;
@@ -123,6 +133,7 @@ public class AI : MonoBehaviour {
         Vector3 dir = Vector3.Normalize(target.transform.position - transform.position);
         Vector3 targetPos = target.transform.position - dir * 10f;
         path.InitByNavMeshPath(transform.position, targetPos);
+        #endregion
     }
 
     //搜寻目标

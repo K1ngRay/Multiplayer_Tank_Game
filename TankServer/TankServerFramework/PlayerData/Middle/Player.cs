@@ -1,6 +1,6 @@
 ﻿using System;
 
-class Player {
+public class Player {
     //id
     public string id;
     //连接

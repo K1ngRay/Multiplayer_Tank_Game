@@ -8,7 +8,7 @@ public class InfoPanel : PanelBase {
 
     public override void Init(params object[] args) {
         base.Init(args);
-        panelPath = "InfoPanel";
+        panelPath = "UI/InfoPanel";
         layer = TypeClass.PanelLayer.Panel;
     }
 

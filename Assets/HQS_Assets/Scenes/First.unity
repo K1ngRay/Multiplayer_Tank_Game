@@ -692,19 +692,19 @@ MonoBehaviour:
     - {fileID: 1793404169}
     - {fileID: 1307424411}
     - {fileID: 705821315}
-    number: 1
+    number: 3
     color: {r: 1, g: 0, b: 0, a: 1}
   - spawnPoints:
     - {fileID: 985906563}
     - {fileID: 1066078729}
     - {fileID: 1176243859}
-    number: 1
+    number: 3
     color: {r: 0, g: 0, b: 1, a: 1}
   - spawnPoints:
     - {fileID: 1016820609}
     - {fileID: 1161743935}
     - {fileID: 176511984}
-    number: 1
+    number: 3
     color: {r: 0, g: 1, b: 0, a: 1}
   tankPrefabs:
   - {fileID: 1968657004087586, guid: 92958bf8f8b6b7049b4042d54bf0d0a9, type: 2}

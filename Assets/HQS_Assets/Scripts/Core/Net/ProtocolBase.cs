@@ -1,4 +1,4 @@
-﻿class ProtocolBase {
+﻿public class ProtocolBase {
     //解码器
     public virtual ProtocolBase Decode(byte[] readBuffer, int start, int length) {
         return new ProtocolBase();

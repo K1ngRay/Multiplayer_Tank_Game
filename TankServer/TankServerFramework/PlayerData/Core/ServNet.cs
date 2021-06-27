@@ -181,7 +181,7 @@ class ServNet {
     }
 
     private void HandleMainTimer(object sender,System.Timers.ElapsedEventArgs e) {
-        HeartBeat();
+        //HeartBeat();
         timer.Start();
     }
 

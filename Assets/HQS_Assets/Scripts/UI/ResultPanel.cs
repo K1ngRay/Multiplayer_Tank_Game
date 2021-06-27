@@ -13,7 +13,7 @@ public class ResultPanel : PanelBase {
 
     public override void Init(params object[] args) {
         base.Init(args);
-        panelPath = "ResultPanel";
+        panelPath = "UI/ResultPanel";
         layer = TypeClass.PanelLayer.Panel;
         if (args.Length == 1) {
             int camp = (int)args[0];

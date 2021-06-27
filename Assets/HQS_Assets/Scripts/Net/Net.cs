@@ -26,7 +26,6 @@ public class Net : MonoBehaviour {
     Int32 msgLength = 0;
 
     ProtocolBase proto = new ProtocolBytes();
-    #region 异步
     private void Update() {
         recvInput.text = recvStr;
     }
@@ -142,25 +141,4 @@ public class Net : MonoBehaviour {
         Debug.Log("发送 " + protocol.GetDesc());
         Send(protocol);
     }
-    #endregion
-    #region 同步
-    //public void Connection() {
-    //    recvInput.text = "";
-    //    socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-    //    string host = hostInput.text;
-    //    int port = int.Parse(portInput.text);
-    //    socket.Connect(host, port); //连接服务器
-    //    clientInput.text = socket.LocalEndPoint.ToString();
-    //    //Send
-    //    string str = "Hello Unity";
-    //    byte[] bytes = System.Text.Encoding.Default.GetBytes(str);
-    //    socket.Send(bytes);
-    //    //Recv
-    //    int count = socket.Receive(readBuffer);
-    //    str = System.Text.Encoding.UTF8.GetString(readBuffer, 0, count);
-    //    recvInput.text = str;
-    //    //close
-    //    socket.Close();
-    //}
-    #endregion
 }

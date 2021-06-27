@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class Root : MonoBehaviour {
 
-	void Start () {
-        PanelMgr.Instance.OpenPanel<TitlePanel>("");
-	}
-	
+    void Start() {
+        PanelMgr.Instance.OpenPanel<LoginPanel>("");
+        Application.runInBackground = true;
+    }
+
+    void Update() {
+        NetMgr.Update();
+    }
+
 }

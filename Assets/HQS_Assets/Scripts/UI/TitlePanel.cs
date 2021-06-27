@@ -9,7 +9,7 @@ public class TitlePanel : PanelBase {
 
     public override void Init(params object[] args) {
         base.Init(args);
-        panelPath = "TitlePanel";
+        panelPath = "UI/TitlePanel";
         layer = TypeClass.PanelLayer.Panel;
     }
 

@@ -12,7 +12,7 @@ partial class HandleConnMsg {
         string id = protocol.GetString(start, ref start);
         string pw = protocol.GetString(start, ref start);
         string strFormat = "[收到注册协议]" + conn.GetAddress();
-        Console.WriteLine(strFormat + " 用户名:" + id + " 密码" + pw);
+        Console.WriteLine(strFormat + " 用户名:" + id + " 密码:" + pw);
         protocol = new ProtocolBytes();
         protocol.AddString("Register");
 

@@ -6,5 +6,5 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/HQS_Assets/Scenes/Walk.unity
-    guid: 86bf29f257690c845a0e621d7a543cb7
+    path: Assets/HQS_Assets/Scenes/Net_Login.unity
+    guid: 4bd17a3804e12e94d95848e3a14851a2

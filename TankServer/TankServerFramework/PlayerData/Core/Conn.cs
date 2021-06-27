@@ -7,7 +7,7 @@ using MySql.Data.MySqlClient;
 using System.Reflection;
 using System.Threading;
 
-class Conn {
+public class Conn {
     //缓冲区大小
     public const int BUFFER_SIZE = 1024;
     //Socket

@@ -13,7 +13,7 @@ public class OptionPanel : PanelBase {
 
     public override void Init(params object[] args) {
         base.Init(args);
-        panelPath = "OptionPanel";
+        panelPath = "UI/OptionPanel";
         layer = TypeClass.PanelLayer.Panel;
     }
 
