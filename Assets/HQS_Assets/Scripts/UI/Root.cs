@@ -5,7 +5,7 @@ using UnityEngine;
 public class Root : MonoBehaviour {
 
     void Start() {
-        PanelMgr.Instance.OpenPanel<LoginPanel>("");
+        PanelMgr.Instance.OpenPanel<RoomListPanel>("");
         Application.runInBackground = true;
     }
 

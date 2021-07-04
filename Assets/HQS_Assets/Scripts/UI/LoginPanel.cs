@@ -29,14 +29,16 @@ public class LoginPanel : PanelBase {
     private void OnLoginClick() {
         //前端校验：用户名密码为空
         if(idIF.text == "" || pwIF.text == "") {
-            Debug.Log("用户名密码不能为空");
+            PanelMgr.Instance.OpenPanel<TipsPanel>("", "用户名密码不能为空!");
             return;
         }
         if (NetMgr.srvConn.status != Connection.Status.Connected) {
             string host = "127.0.0.1";
             int port = 1234;
             NetMgr.srvConn.proto = new ProtocolBytes();
-            NetMgr.srvConn.Connect(host, port);
+            if(!NetMgr.srvConn.Connect(host, port)) {
+                PanelMgr.Instance.OpenPanel<TipsPanel>("", "连接服务器失败!");
+            }
         }
         //发送
         ProtocolBytes protocol = new ProtocolBytes();
@@ -61,9 +63,12 @@ public class LoginPanel : PanelBase {
         if (ret == 0) {
             Debug.Log("登录成功！");
             //开始游戏
-            Walk_two.instance.StartGame(idIF.text);
+            //Walk_two.instance.StartGame(idIF.text);
+            //todo:待实现
+            //PanelMgr.Instance.OpenPanel<>
+            //Gam
             Close();
         }
-        else Debug.Log("登录失败！");
+        else PanelMgr.Instance.OpenPanel<TipsPanel>("","登录失败!");
     }
 }

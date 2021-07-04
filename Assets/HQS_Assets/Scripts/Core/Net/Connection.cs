@@ -76,7 +76,7 @@ public class Connection {
         if (bufferCount < msgLength + sizeof(int)) {
             return;
         }
-        //协议解码 //todo:好像还没实现吧
+        //协议解码
         ProtocolBase protocol = proto.Decode(readBuffer, sizeof(int), msgLength);
         Debug.Log("收到消息 " + protocol.GetDesc());
         lock (msgDist.msgList) {

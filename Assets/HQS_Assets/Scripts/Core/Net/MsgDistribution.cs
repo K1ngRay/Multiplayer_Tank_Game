@@ -58,7 +58,7 @@ public class MsgDistribution {
     //删除监听
     public void DelListener(string name, Delegate cb) {
         if (eventDic.ContainsKey(name)) {
-            eventDic[name] -= cb;
+            eventDic[name] -= cb;            
             if (eventDic[name] == null)
                 eventDic.Remove(name);
         }
