@@ -57,22 +57,6 @@ public class RoomListPanel : PanelBase {
         protocol = new ProtocolBytes();
         protocol.AddString("GetAchieve");
         NetMgr.srvConn.Send(protocol);
-
-        //测试
-        ProtocolBytes a = new ProtocolBytes();
-        a.AddString("GetRoomInfo");
-        a.AddInt(3);
-
-        a.AddInt(1);
-        a.AddInt(2);
-
-        a.AddInt(3);
-        a.AddInt(1);
-
-        a.AddInt(3);
-        a.AddInt(1);
-        RecvGetRoomList(a);
-
     }
 
     public override void OnClosing() {
@@ -215,5 +199,6 @@ public class RoomListPanel : PanelBase {
         PanelMgr.Instance.OpenPanel<TipsPanel>("", "登出成功!");
         PanelMgr.Instance.OpenPanel<LoginPanel>("");
         NetMgr.srvConn.Close();
+        Close();
     }
 }

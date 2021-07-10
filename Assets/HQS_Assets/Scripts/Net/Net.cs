@@ -107,7 +107,7 @@ public class Net : MonoBehaviour {
 
     public void OnSendClick() {
         ProtocolBytes protocol = new ProtocolBytes();
-        protocol.AddString("HeatBeat");
+        protocol.AddString("HeartBeat");
         Debug.Log("发送" + protocol.GetDesc());
         Send(protocol);
     }

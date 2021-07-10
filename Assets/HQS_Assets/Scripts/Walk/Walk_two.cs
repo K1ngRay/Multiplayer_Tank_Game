@@ -102,7 +102,6 @@ public class Walk_two : MonoBehaviour {
         ProtocolBytes proto = (ProtocolBytes)protocol;
         //获取头部数值
         int start = 0;
-        //todo:研究一下是怎么获取到协议名的
         string protoName = proto.GetString(start, ref start);
         int count = proto.GetInt(start, ref start);
         //遍历

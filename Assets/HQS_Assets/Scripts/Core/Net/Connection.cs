@@ -26,7 +26,7 @@ public class Connection {
     public ProtocolBase proto;
     //心跳
     public float lastTickTime = 0;
-    public float heartBeatTime = 0;
+    public float heartBeatTime = 30;
     //消息分发
     public MsgDistribution msgDist = new MsgDistribution();
 

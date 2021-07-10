@@ -13,7 +13,7 @@ public class NetMgr {
     //心跳
     public static ProtocolBase GetHeartBeatProtocol() {        
         ProtocolBytes protocol = new ProtocolBytes();
-        protocol.AddString("HeatBeat");
+        protocol.AddString("HeartBeat");
         return protocol;
     }
 }

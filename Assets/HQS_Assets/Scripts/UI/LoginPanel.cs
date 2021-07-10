@@ -64,9 +64,8 @@ public class LoginPanel : PanelBase {
             Debug.Log("登录成功！");
             //开始游戏
             //Walk_two.instance.StartGame(idIF.text);
-            //todo:待实现
-            //PanelMgr.Instance.OpenPanel<>
-            //Gam
+            PanelMgr.Instance.OpenPanel<RoomListPanel>("");
+            GameMgr.Instance.id = idIF.text;
             Close();
         }
         else PanelMgr.Instance.OpenPanel<TipsPanel>("","登录失败!");

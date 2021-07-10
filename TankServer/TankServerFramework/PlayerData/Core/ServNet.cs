@@ -98,11 +98,12 @@ class ServNet {
             conn.bufferCount += count;
             ProcessData(conn);
             //继续接收
-            conn.socket.BeginReceive(conn.readBuffer, conn.bufferCount,
-                conn.BufferRemain(), SocketFlags.None, ReceiveCb, conn);
+            if (conn.isUse)
+                conn.socket.BeginReceive(conn.readBuffer, conn.bufferCount,
+                    conn.BufferRemain(), SocketFlags.None, ReceiveCb, conn);
         }
         catch (Exception e) {
-            Console.WriteLine("收到[" + conn.GetAddress() + "]断开连接");
+            Console.WriteLine("收到[" + conn.GetAddress() + "]断开连接,错误信息:" + e.Message);
             conn.Close();
         }
     }
@@ -149,7 +150,7 @@ class ServNet {
     public void Send(Conn conn,string str) {
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(str);
         byte[] length = BitConverter.GetBytes(bytes.Length);
-        byte[] sendBuffer = length.Concat(bytes).ToArray(); //todo:这是什么操作
+        byte[] sendBuffer = length.Concat(bytes).ToArray();
         try {
             conn.socket.BeginSend(sendBuffer, 0, sendBuffer.Length,
                 SocketFlags.None, null, null);
@@ -187,9 +188,9 @@ class ServNet {
 
     private void HandleMsg(Conn conn,ProtocolBase protoBase) {
         string name = protoBase.GetName();
-        string methodName = "Msg" + name; //todo:值得好好学学
+        string methodName = "Msg" + name; //todo:值得好好学学,反射到底有啥好呢
 
-        if(conn.player == null || name == "HeatBeat" || name == "Logout") {
+        if(conn.player == null || name == "HeartBeat" || name == "Logout") {
             MethodInfo mm = handleConnMsg.GetType().GetMethod(methodName);
             if (mm == null) {
                 string str = "[警告]HandleMsg:没有处理连接方法";

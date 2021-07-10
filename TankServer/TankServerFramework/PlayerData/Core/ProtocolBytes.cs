@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-class ProtocolBytes : ProtocolBase {
+public class ProtocolBytes : ProtocolBase {
     public byte[] bytes;
 
     public override ProtocolBase Decode(byte[] readBuffer, int start, int length) {

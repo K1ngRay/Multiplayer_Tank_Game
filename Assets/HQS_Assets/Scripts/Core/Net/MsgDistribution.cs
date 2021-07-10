@@ -49,10 +49,10 @@ public class MsgDistribution {
 
     //添加单词监听
     public void AddOnceListener(string name, Delegate cb) {
-        if (eventDic.ContainsKey(name))
-            eventDic[name] += cb;
+        if (onceDic.ContainsKey(name))
+            onceDic[name] += cb;
         else
-            eventDic[name] = cb;
+            onceDic[name] = cb;
     }
 
     //删除监听

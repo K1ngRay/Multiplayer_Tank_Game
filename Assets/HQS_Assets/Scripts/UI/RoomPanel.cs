@@ -41,30 +41,6 @@ public class RoomPanel : PanelBase {
         ProtocolBytes protocol = new ProtocolBytes();
         protocol.AddString("GetRoomInfo");
         NetMgr.srvConn.Send(protocol);
-
-        //测试
-        ProtocolBytes a = new ProtocolBytes();
-        a.AddString("GetRoomInfo");
-        a.AddInt(3);
-
-        a.AddString("Killer");
-        a.AddInt(1);
-        a.AddInt(15);
-        a.AddInt(18);
-        a.AddInt(0);
-
-        a.AddString("FireGod");
-        a.AddInt(2);
-        a.AddInt(15);
-        a.AddInt(18);
-        a.AddInt(0);
-
-        a.AddString("123131");
-        a.AddInt(3);
-        a.AddInt(15);
-        a.AddInt(18);
-        a.AddInt(1);
-        RecvGetRoomInfo(a);
     }
 
     public override void OnClosing() {
