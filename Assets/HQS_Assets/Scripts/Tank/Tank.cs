@@ -61,8 +61,8 @@ public class Tank : MonoBehaviour {
     public TypeClass.CtrlType ctrlType = TypeClass.CtrlType.Player;
 
     //血量
-    public int hp = 100;
-    public int maxHp = 100;
+    public float hp = 100;
+    public float maxHp = 100;
     [SerializeField]
     private GameObject destroyEff;
     //血量GUI
@@ -401,9 +401,13 @@ public class Tank : MonoBehaviour {
             bullet.attackTank = this;
         }
         lastShootTime = Time.time;
+
+        //发送同步信息
+        if (ctrlType == TypeClass.CtrlType.Player)
+            SendShootInfo(bulletObj.transform);
     }
 
-    public void BeAttacked(int att, Tank attackTank) {
+    public void BeAttacked(float att, Tank attackTank) {
         if (hp <= 0) return;
         if (hp > 0) {
             hp -= att;
@@ -658,14 +662,15 @@ public class Tank : MonoBehaviour {
 
     public void NetWheelsRotation() {
         float z = transform.InverseTransformPoint(forePos).z;
+        //声音老是重新播放，先注释了
         ////判断坦克是否正在移动
-        //if (Mathf.Abs(z) < 0.1f || delta <= 0.05f) {
-        //    if (motorAS.isPlaying) {
-        //        Debug.Log("motorAS.Stop()");
-        //        motorAS.Stop();
-        //    }
-        //    return;
-        //}
+        if (Mathf.Abs(z) < 0.1f || delta <= 0.05f) {
+            //    if (motorAS.isPlaying) {
+            //        Debug.Log("motorAS.Stop()");
+            //        motorAS.Stop();
+            //    }
+            return;
+        }
 
         //轮子
         foreach (var wheel in wheelObjects) {
@@ -686,6 +691,66 @@ public class Tank : MonoBehaviour {
         //}
     }
 
+    public void SendShootInfo(Transform bulletTrans) {
+        ProtocolBytes proto = new ProtocolBytes();
+        proto.AddString("Shooting");
+        //位置旋转
+        Vector3 pos = bulletTrans.position;
+        Vector3 rot = bulletTrans.eulerAngles;
+        proto.AddFloat(pos.x);
+        proto.AddFloat(pos.y);
+        proto.AddFloat(pos.z);
+        proto.AddFloat(rot.x);
+        proto.AddFloat(rot.y);
+        proto.AddFloat(rot.z);
+        NetMgr.srvConn.Send(proto);
+    }
+
+    public void NetShoot(Vector3 pos, Vector3 rot) {
+        //产生炮弹
+        PoolObject poolObj = bullet.GetComponent<PoolObject>();
+        if (poolObj == null) return;
+
+        GameObject bulletObj = ObjectPool.Pop(poolObj.objName, bullet, pos, Quaternion.Euler(rot));
+        //为炮弹标记自己的信息
+        Bullet bulletCmp = bulletObj.GetComponent<Bullet>();
+        if (bulletCmp != null) {
+            bulletCmp.attackTank = this;
+        }
+
+        shootAS.Play();
+    }
+
+    public void SendHit(string id,float damage) {
+        ProtocolBytes proto = new ProtocolBytes();
+        proto.AddString("Hit");
+        proto.AddString(id);
+        proto.AddFloat(damage);
+        NetMgr.srvConn.Send(proto);
+    }
+
+    public void NetBeAttacked(float att,Tank attackTank) {
+        //扣除生命值
+        if (hp <= 0) return;
+        if (hp > 0) hp -= att;
+        //被击毁
+        if (hp <= 0) {
+            ctrlType = TypeClass.CtrlType.Death;
+            if (destroyEff == null) {
+                MyDebug.DebugNull("destroyEff");
+                return;
+            }
+            destroyEff.SetActive(true);
+
+            //击杀提示
+            if (attackTank == null) {
+                MyDebug.DebugNull("attackTank");
+                return;
+            }
+
+            attackTank.StartDrawKill();
+        }
+    }
 
     #endregion
 }

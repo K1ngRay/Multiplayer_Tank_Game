@@ -15,5 +15,10 @@ class HandlePlayerEvent {
                 room.Broadcast(room.GetRoomInfo());
             }
         }
+        if(player.tempData.status == PlayerTempData.Status.Fight) {
+            Room room = player.tempData.room;
+            room.ExitFight(player);
+            RoomMgr.instance.LeaveRoom(player);
+        }
     }
 }

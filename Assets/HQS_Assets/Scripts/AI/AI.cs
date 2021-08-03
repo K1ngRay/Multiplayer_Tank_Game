@@ -164,7 +164,7 @@ public class AI : MonoBehaviour {
     //没有目标，主动搜索视野范围内的坦克
     void NoTarget() {
         //优先寻找生命值最少的
-        int minHP = int.MaxValue;
+        float minHP = float.MaxValue;
         GameObject[] targets = GameObject.FindGameObjectsWithTag("Tank");
         for (int i = 0; i < targets.Length; i++) {
             Tank targetTank = targets[i].GetComponent<Tank>();

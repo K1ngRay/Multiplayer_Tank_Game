@@ -1125,6 +1125,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13e5609dd1ed7e249a98c027c84836fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  distance: 8
+  maxDis: 22
+  minDis: 5
+  zoomSpeed: 0.5
+  rot: 0
+  rotSpeed: 2
+  roll: 0.5235988
+  rollSpeed: 2
+  maxRoll: 0.6632251
+  minRoll: -0.17453294
 --- !u!1 &1731870119
 GameObject:
   m_ObjectHideFlags: 0

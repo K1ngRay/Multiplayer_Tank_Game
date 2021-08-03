@@ -40,7 +40,7 @@ public class Room {
             if (item.tempData.team == 2) count2++;
             if (item.tempData.team == 3) count3++;
         }
-        if(count1 <= count2) {
+        if (count1 <= count2) {
             if (count3 < count1) return 3;
             else return 1;
         }
@@ -49,7 +49,7 @@ public class Room {
             else return 2;
         }
     }
-    
+
     public void DelPlayer(string id) {
         lock (dict) {
             if (!dict.ContainsKey(id)) return;
@@ -133,6 +133,7 @@ public class Room {
                 item.tempData.hp = 200;
                 protocol.AddString(item.id);
                 protocol.AddInt(item.tempData.team);
+                protocol.AddFloat(item.tempData.hp);
                 if (item.tempData.team == 1)
                     protocol.AddInt(teamPos1++);
                 else if (item.tempData.team == 2)
@@ -143,6 +144,70 @@ public class Room {
             }
             Broadcast(protocol);
         }
+    }
+
+    private int IsWin() {
+        if (status != Status.Fight)
+            return 0;
+
+        int count1 = 0;
+        int count2 = 0;
+        int count3 = 0;
+        foreach (var player in dict.Values) {
+            PlayerTempData pt = player.tempData;
+            if (pt.team == 1 && pt.hp > 0) count1++;
+            if (pt.team == 2 && pt.hp > 0) count2++;
+            if (pt.team == 3 && pt.hp > 0) count3++;
+        }
+        if (count2 <= 0 && count3 <= 0 && count1 > 0) return 1;
+        if (count1 <= 0 && count3 <= 0 && count2 > 0) return 2;
+        if (count1 <= 0 && count2 <= 0 && count3 > 0) return 3;
+        return 0;
+    }
+
+    public void UpdateWin() {
+        int isWin = IsWin();
+        if (isWin == 0)
+            return;
+        
+        //有一方胜利
+        lock (dict) {
+            status = Status.Prepare; //改变房间状态
+            foreach (Player player in dict.Values) {
+                player.tempData.status = PlayerTempData.Status.Room;
+                if (player.tempData.team == isWin)
+                    player.data.win++;
+                else
+                    player.data.fail++;
+            }
+        }
+
+        //广播
+        ProtocolBytes protocol = new ProtocolBytes();
+        protocol.AddString("Result");
+        protocol.AddInt(isWin);
+        Broadcast(protocol);
+    }
+
+    //中途退出战斗
+    public void ExitFight(Player player) {
+        //摧毁坦克
+        if (dict[player.id] != null)
+            dict[player.id].tempData.hp = -1;
+        //模拟客户端Hit协议
+        //广播消息
+        ProtocolBytes protoRet = new ProtocolBytes();
+        protoRet.AddString("Hit");
+        protoRet.AddString(player.id);
+        protoRet.AddString(player.id); //自己杀死自己，所以id一致
+        protoRet.AddFloat(float.MaxValue);
+        Broadcast(protoRet);
+        //添加失败次数
+        if (IsWin() == 0)
+            player.data.fail++;
+
+        //胜负判断
+        UpdateWin();
     }
 }
 

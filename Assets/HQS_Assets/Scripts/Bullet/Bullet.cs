@@ -46,14 +46,15 @@ public class Bullet : PoolObject {
         //击中坦克
         Tank tank = collision.gameObject.GetComponent<Tank>();
         if (tank != null) {
-            int att = GetAtt();
-            tank.BeAttacked(att, attackTank);
+            float att = GetAtt();
+            //tank.BeAttacked(att, attackTank); //单机
+            tank.SendHit(tank.name, att); //联机
         }
     }
 
-    public int GetAtt() {
+    public float GetAtt() {
         float att = this.att - (Time.time - instTime) * 40;
         if (att < 1) att = 1;
-        return (int)att;
+        return att;
     }
 }
