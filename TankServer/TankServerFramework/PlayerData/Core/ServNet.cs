@@ -127,13 +127,7 @@ class ServNet {
         conn.msgLength = BitConverter.ToInt32(conn.lenBytes, 0); //获取长度
         if (conn.bufferCount < conn.msgLength + sizeof(Int32))
             return;
-        //string str = System.Text.Encoding.UTF8.GetString(conn.readBuffer,
-        //    sizeof(Int32), conn.msgLength);
 
-        //Console.WriteLine("收到消息[" + conn.GetAddress() + "]" + str);
-        //if (str == "HeatBeat")
-        //    conn.lastTickTime = Sys.GetTimeStamp();
-        //Send(conn, str);
         //处理消息
         ProtocolBase protocol = proto.Decode(conn.readBuffer, sizeof(int), conn.msgLength);
         HandleMsg(conn, protocol);

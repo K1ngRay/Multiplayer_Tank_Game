@@ -92,6 +92,19 @@ public class Tank : MonoBehaviour {
     //导航障碍
     public NavMeshObstacle navObstacle;
 
+    //网络同步
+    private float lastSendInfoTime = float.MinValue;
+    private float lastRecvInfoTime = float.MinValue;
+    //同步时间间隔
+    float delta = 1;
+    //last
+    private Vector3 lastPos;
+    private Vector3 lastRot;
+    //forecast
+    private Vector3 forePos;
+    private Vector3 foreRot;
+
+
     public Transform Turret {
         get {
             return turret;
@@ -132,6 +145,13 @@ public class Tank : MonoBehaviour {
     }
 
     void Update() {
+
+        //网络同步
+        if (ctrlType == TypeClass.CtrlType.Net) {
+            NetUpdate();
+            return;
+        }
+
         PlayerCtrl();
         ComputerCtrl();
         DeathCtrl();
@@ -141,6 +161,7 @@ public class Tank : MonoBehaviour {
         TurretRoll(turret, gun);
 
         MotorSound(motorAS);
+
     }
 
     void OnGUI() {
@@ -167,6 +188,13 @@ public class Tank : MonoBehaviour {
             motor = 0;
             steering = 0;
             brakeTorque = maxBrakeTorque;
+        }
+
+        //网络同步
+        if (Time.time - lastSendInfoTime > 0.2f) {
+            SendUnitInfo();
+
+            lastSendInfoTime = Time.time;
         }
     }
 
@@ -447,9 +475,9 @@ public class Tank : MonoBehaviour {
         if (Physics.Raycast(ray, out hit, 400f)) {
             hitPoint = hit.point;
             Tank targetTank = hit.transform.GetComponent<Tank>();
-            if (targetTank != null && !Battle.Instance.IsSameCamp(this, targetTank) && tankSights[1] != null)
+            if (targetTank != null && !MultiBattle.Instance.IsSameCamp(this.gameObject, targetTank.gameObject) && tankSights[1] != null)
                 tankSight = tankSights[1];
-            else if(tankSights[0] != null)
+            else if (tankSights[0] != null)
                 tankSight = tankSights[0];
         }
         else {
@@ -552,5 +580,113 @@ public class Tank : MonoBehaviour {
             arrowUI.height * d);
         GUI.DrawTexture(arrowRect, arrowUI);
     }
+
+    #endregion
+
+    #region 网络
+    public void SendUnitInfo() {
+        ProtocolBytes proto = new ProtocolBytes();
+        proto.AddString("UpdateUnitInfo");
+        //位置旋转
+        Vector3 pos = transform.position;
+        Vector3 rot = transform.eulerAngles;
+        proto.AddFloat(pos.x);
+        proto.AddFloat(pos.y);
+        proto.AddFloat(pos.z);
+        proto.AddFloat(rot.x);
+        proto.AddFloat(rot.y);
+        proto.AddFloat(rot.z);
+        //炮塔
+        float angleY = turretRotTarget;
+        proto.AddFloat(angleY);
+        //炮管
+        float angleX = turretRollTarget;
+        proto.AddFloat(angleX);
+        NetMgr.srvConn.Send(proto);
+    }
+
+    //初始化位置预测数据
+    public void InitNetCtrl() {
+        lastPos = transform.position;
+        lastRot = transform.eulerAngles;
+        forePos = transform.position;
+        foreRot = transform.eulerAngles;
+        //对于网络同步，不依赖物理系统
+        Rigidbody r = GetComponent<Rigidbody>();
+        r.constraints = RigidbodyConstraints.FreezeAll;
+    }
+
+    public void NetForecastInfo(Vector3 nextPos, Vector3 curRot) {
+        //时间
+        delta = Time.time - lastRecvInfoTime;
+        //预测的位置
+        if (delta > 0.3f) {
+            forePos = nextPos;
+            foreRot = curRot;
+        }
+        else {
+            forePos = lastPos + (nextPos - lastPos) * 2;
+            foreRot = lastRot + (curRot - lastRot) * 2;
+        }
+
+        //更新
+        lastPos = nextPos;
+        lastRot = curRot;
+        lastRecvInfoTime = Time.time;
+    }
+
+    public void NetUpdate() {
+        //当前位置
+        Vector3 pos = transform.position;
+        Vector3 rot = transform.eulerAngles;
+        //更新位置
+        if (delta > 0) {
+            transform.position = Vector3.Lerp(pos, forePos, delta);
+            transform.rotation = Quaternion.Lerp(Quaternion.Euler(rot), Quaternion.Euler(foreRot), delta);
+        }
+
+        TurretRotate(turret);
+        TurretRoll(turret, gun);
+        //轮子履带马达音效
+        NetWheelsRotation();
+    }
+
+    public void NetTurretTarget(float y, float x) {
+        turretRotTarget = y;
+        turretRollTarget = x;
+    }
+
+    public void NetWheelsRotation() {
+        float z = transform.InverseTransformPoint(forePos).z;
+        ////判断坦克是否正在移动
+        //if (Mathf.Abs(z) < 0.1f || delta <= 0.05f) {
+        //    if (motorAS.isPlaying) {
+        //        Debug.Log("motorAS.Stop()");
+        //        motorAS.Stop();
+        //    }
+        //    return;
+        //}
+
+        //轮子
+        foreach (var wheel in wheelObjects) {
+            wheel.localEulerAngles += new Vector3(360 * z / delta, 0, 0);
+        }
+        //履带
+        float offset = -wheelObjects[0].localEulerAngles.x / 90f;
+        foreach (var track in trackObjects) {
+            Material mtl = track.material;
+            mtl.mainTextureOffset = new Vector2(0, offset);
+        }
+        ////声音
+        //if (!motorAS.isPlaying) {
+        //    motorAS.loop = true;
+        //    if (motorAS.clip != null)
+        //        motorAS.Play();
+        //    Debug.Log("motorAS.Play()");
+        //}
+    }
+
+
+    #endregion
 }
-#endregion
+

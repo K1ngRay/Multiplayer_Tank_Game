@@ -78,7 +78,7 @@ public class Connection {
         }
         //协议解码
         ProtocolBase protocol = proto.Decode(readBuffer, sizeof(int), msgLength);
-        Debug.Log("收到消息 " + protocol.GetDesc());
+        //Debug.Log("收到消息 " + protocol.GetDesc());
         lock (msgDist.msgList) {
             msgDist.msgList.Add(protocol);
         }

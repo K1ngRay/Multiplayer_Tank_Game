@@ -6,7 +6,8 @@ public class TypeClass {
     public enum CtrlType {
         Death,
         Player,
-        Computer
+        Computer,
+        Net
     }
 
     public enum FSMStatus {

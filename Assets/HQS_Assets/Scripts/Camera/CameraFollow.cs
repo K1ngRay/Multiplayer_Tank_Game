@@ -6,17 +6,27 @@ public class CameraFollow : MonoBehaviour {
 
     private GameObject target;
 
+    [SerializeField]
     private float distance = 8f;
+    [SerializeField]
     private float maxDis = 22f;
+    [SerializeField]
     private float minDis = 5f;
+    [SerializeField]
     private float zoomSpeed = 0.5f;
 
+    [SerializeField]
     private float rot = 0f; //横向旋转角度
+    [SerializeField]
     private float rotSpeed = 2f;
 
+    [SerializeField]
     private float roll = 30f * Mathf.PI * 2 / 360; //纵向旋转角度
+    [SerializeField]
     private float rollSpeed = 2f;
+    [SerializeField]
     private float maxRoll = 38f * Mathf.PI * 2 / 360f;
+    [SerializeField]
     private float minRoll = -10f * Mathf.PI * 2 / 360f;
     void Start() {
     }

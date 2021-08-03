@@ -596,7 +596,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u6307\u6325\u5B98\uFF1A\nxxxxx"
+  m_Text: "\u6307\u6325\u5B98\uFF1A\nxxxxx111111111111111111"
 --- !u!114 &114045402608162082
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2100,8 +2100,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 103, y: -106.5}
-  m_SizeDelta: {x: 160, y: 60}
+  m_AnchoredPosition: {x: 134.88, y: -131}
+  m_SizeDelta: {x: 223.76, y: 85.77}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224384421077979106
 RectTransform:
@@ -2168,7 +2168,7 @@ RectTransform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1595009012095562}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:

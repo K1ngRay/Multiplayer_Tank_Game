@@ -90,7 +90,7 @@ public class RoomListPanel : PanelBase {
         int win = proto.GetInt(start, ref start);
         int lose = proto.GetInt(start, ref start);
         //处理
-        playerNameTxt.text = "指挥官：" + GameMgr.Instance.id;
+        playerNameTxt.text = "指挥官:\n\r" + GameMgr.Instance.id;
         winTxt.text = win.ToString();
         loseTxt.text = lose.ToString();
     }

@@ -124,7 +124,7 @@ public class Net : MonoBehaviour {
         protocol.AddString("Login");
         protocol.AddString(idInput.text);
         protocol.AddString(pwdInput.text);
-        Debug.Log("发送 " + protocol.GetDesc()); //todo:数据是怎么组建的
+        Debug.Log("发送 " + protocol.GetDesc());
         Send(protocol);
     }
 

@@ -42,7 +42,7 @@ public class MsgDistribution {
     //注册监听
     public void AddListener(string name, Delegate cb) {
         if (eventDic.ContainsKey(name))
-            eventDic[name] += cb; //todo:这样不会加入要多委托吗？
+            eventDic[name] += cb;
         else
             eventDic[name] = cb;
     }

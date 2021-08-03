@@ -98,5 +98,51 @@ public class Room {
         }
         return protocol;
     }
+
+    //房间能否开战
+    public bool CanStart() {
+        if (status != Status.Prepare)
+            return false;
+
+        int count1 = 0;
+        int count2 = 0;
+        int count3 = 0;
+
+        foreach (Player item in dict.Values) {
+            if (item.tempData.team == 1) count1++;
+            if (item.tempData.team == 2) count2++;
+            if (item.tempData.team == 3) count3++;
+        }
+
+        if (count1 + count2 + count3 < 2)
+            return false;
+
+        return true;
+    }
+
+    public void StartFight() {
+        ProtocolBytes protocol = new ProtocolBytes();
+        protocol.AddString("Fight");
+        status = Status.Fight; //修改房间状态
+        int teamPos1 = 1; //todo:为什么都要初始为1
+        int teamPos2 = 1;
+        int teamPos3 = 1;
+        lock (dict) {
+            protocol.AddInt(dict.Count);
+            foreach (var item in dict.Values) {
+                item.tempData.hp = 200;
+                protocol.AddString(item.id);
+                protocol.AddInt(item.tempData.team);
+                if (item.tempData.team == 1)
+                    protocol.AddInt(teamPos1++);
+                else if (item.tempData.team == 2)
+                    protocol.AddInt(teamPos2++);
+                else protocol.AddInt(teamPos3++);
+
+                item.tempData.status = PlayerTempData.Status.Fight;
+            }
+            Broadcast(protocol);
+        }
+    }
 }
 

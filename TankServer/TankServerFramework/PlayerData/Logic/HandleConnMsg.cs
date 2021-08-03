@@ -16,7 +16,6 @@ public partial class HandleConnMsg {
         protocol = new ProtocolBytes();
         protocol.AddString("Register");
 
-        //todo:在干嘛？
         if (DataMgr.instance.Register(id,pw)) {
             protocol.AddInt(0);
         }

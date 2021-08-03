@@ -29,6 +29,7 @@ public class RoomPanel : PanelBase {
         }
         closeBtn = listPanel.Find("CloseBtn").GetComponent<Button>();
         startBtn = listPanel.Find("StartBtn").GetComponent<Button>();
+        startBtn.gameObject.SetActive(false);
 
         closeBtn.onClick.AddListener(OnCloseClick);
         startBtn.onClick.AddListener(OnStartClick);
@@ -101,13 +102,19 @@ public class RoomPanel : PanelBase {
                 infoTrans.GetComponent<Image>().color = new Color(0, 1, 0, 0.7f);
             }
             gradeTxt.text = "胜利:" + win.ToString() + "  失败:" + fail.ToString();
+            
+            string idstr = "";
             if (identity == 1) {
-                identityTxt.text = "[房主]";
+                idstr += "[房主]";
             }
-            else if (GameMgr.Instance.id == name) {
-                identityTxt.text = "[我自己]";
+            if (GameMgr.Instance.id == name) {
+                idstr += "[我自己]";
+                if(identity == 1)
+                    startBtn.gameObject.SetActive(true);
+                else startBtn.gameObject.SetActive(false);
             }
-            else identityTxt.text = "";
+            identityTxt.text = idstr;
+
         }
         for (; i < 9; i++) {
             Transform trans = prefabs[i];
@@ -121,7 +128,7 @@ public class RoomPanel : PanelBase {
 
     private void RecvFight(ProtocolBase protocol) {
         ProtocolBytes proto = (ProtocolBytes)protocol;
-        //todo:多人战斗开始
+        MultiBattle.Instance.StartBattle(proto);
         Close();
     }
 

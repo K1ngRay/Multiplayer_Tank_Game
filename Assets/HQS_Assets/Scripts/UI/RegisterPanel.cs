@@ -47,7 +47,7 @@ public class RegisterPanel : PanelBase {
         protocol.AddString("Register");
         protocol.AddString(idIF.text);
         protocol.AddString(pwIF.text);
-        Debug.Log("发送 " + protocol.GetDesc()); //todo:看看GetDesc的实现
+        Debug.Log("发送 " + protocol.GetDesc());
         NetMgr.srvConn.Send(protocol, OnRegisterBack);
     }
 
@@ -57,7 +57,6 @@ public class RegisterPanel : PanelBase {
     }
     
     private void OnRegisterBack(ProtocolBase protocol) {
-        //todo:看看回调怎么用
         ProtocolBytes proto = (ProtocolBytes)protocol;
         int start = 0;
         string protoName = proto.GetString(start, ref start);
